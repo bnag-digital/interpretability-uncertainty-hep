@@ -1,0 +1,231 @@
+<title>Explainer disagreement against a measured noise floor</title>
+<style>
+  :root {
+    --ground: #f7f8fa;
+    --surface: #ffffff;
+    --ink: #161a22;
+    --muted: #5c6675;
+    --faint: #8c94a1;
+    --rule: #dde1e8;
+    --accent: #0e7c86;
+    --accent-soft: #e4f1f2;
+    --warn: #9a5b08;
+    --warn-soft: #f8efe0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #10131a;
+      --surface: #171b24;
+      --ink: #e6e9f0;
+      --muted: #a2abba;
+      --faint: #77808f;
+      --rule: #2a303c;
+      --accent: #4bb8c2;
+      --accent-soft: #143034;
+      --warn: #d9a054;
+      --warn-soft: #2d2517;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #10131a;
+    --surface: #171b24;
+    --ink: #e6e9f0;
+    --muted: #a2abba;
+    --faint: #77808f;
+    --rule: #2a303c;
+    --accent: #4bb8c2;
+    --accent-soft: #143034;
+    --warn: #d9a054;
+    --warn-soft: #2d2517;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 3rem 1.5rem 5rem;
+  }
+  .wrap { max-width: 60rem; margin: 0 auto; display: flex; flex-direction: column; gap: 2.75rem; }
+  .prose { max-width: 40rem; display: flex; flex-direction: column; gap: 1rem; }
+
+  h1, h2, h3 { font-family: "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif; font-weight: 600; text-wrap: balance; margin: 0; }
+  h1 { font-size: 2.1rem; line-height: 1.2; letter-spacing: -0.01em; }
+  h2 { font-size: 1.4rem; line-height: 1.3; }
+  h3 { font-size: 1.05rem; }
+  p { margin: 0; }
+  a { color: var(--accent); }
+
+  .eyebrow {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.11em;
+    color: var(--accent); font-weight: 700;
+  }
+  .lede { font-size: 1.1rem; color: var(--muted); max-width: 42rem; }
+
+  header { display: flex; flex-direction: column; gap: 0.7rem; border-bottom: 1px solid var(--rule); padding-bottom: 1.75rem; }
+
+  .figures-in { font-variant-numeric: tabular-nums; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.8rem; color: var(--faint); }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 2.25rem; padding: 1.1rem 0; border-bottom: 1px solid var(--rule); }
+  .stat { display: flex; flex-direction: column; gap: 0.15rem; }
+  .stat b {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-variant-numeric: tabular-nums; font-size: 1.5rem; font-weight: 600; line-height: 1;
+  }
+  .stat span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--faint); }
+
+  section { display: flex; flex-direction: column; gap: 1.1rem; }
+
+  figure { margin: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+  figure img {
+    display: block; width: 100%; height: auto;
+    background: #ffffff; border: 1px solid var(--rule); padding: 0.5rem;
+  }
+  figcaption { display: flex; flex-direction: column; gap: 0.5rem; max-width: 42rem; }
+  .figlabel {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 0.73rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700;
+  }
+  figcaption p { font-size: 0.94rem; color: var(--muted); }
+  figcaption strong { color: var(--ink); font-weight: 600; }
+
+  .note {
+    background: var(--warn-soft); border: 1px solid var(--rule);
+    border-left: 3px solid var(--warn);
+    padding: 1rem 1.15rem; display: flex; flex-direction: column; gap: 0.5rem;
+    max-width: 42rem;
+  }
+  .note .eyebrow { color: var(--warn); }
+  .note p { font-size: 0.92rem; }
+
+  .tablewrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  th, td { padding: 0.5rem 0.9rem; text-align: left; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+  th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--faint); font-weight: 700; }
+  td.num { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  .pass { color: var(--accent); font-weight: 600; }
+  .flat { color: var(--muted); }
+
+  ul { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  li { font-size: 0.95rem; color: var(--muted); }
+  li strong { color: var(--ink); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--rule); padding-top: 1.5rem; color: var(--faint); font-size: 0.85rem; max-width: 42rem; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.87em; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Interpretability uncertainty &middot; jet tagging</div>
+    <h1>Explainer disagreement against a measured noise floor</h1>
+    <p class="lede">Five taggers, five seeds each, on one shared split of the hls4ml 150-particle dataset. The question is whether two explainers disagreeing about a model means anything, or whether it sits inside the noise you get from simply retraining that model.</p>
+    <p class="figures-in">First full figure pass &middot; 11 August 2026</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b>5</b><span>models</span></div>
+    <div class="stat"><b>5</b><span>seeds each</span></div>
+    <div class="stat"><b>240</b><span>attribution runs</span></div>
+    <div class="stat"><b>4</b><span>variance levels</span></div>
+    <div class="stat"><b>154</b><span>tests passing</span></div>
+  </div>
+
+  <section>
+    <div class="prose">
+      <h2>The result</h2>
+      <p>Every comparison is drawn against the grey band, which runs from that pair's retraining ceiling up to perfect agreement. A point inside the band is a disagreement too small to distinguish from retraining the same model with a different seed. A point to the left of it is a real disagreement.</p>
+    </div>
+    <figure>
+      <img src="{{FIG:fig2b_cross_vs_ceiling}}" alt="Cross-explainer agreement plotted against the retraining noise band for every model and explainer pair.">
+      <figcaption>
+        <div class="figlabel">Figure 2b &middot; cross-explainer against the ceiling</div>
+        <p><strong>SHAP against LIME is the clean positive result.</strong> On the BDT and DNN it lands near tau 0.58&ndash;0.60, far outside ceilings of 0.92&ndash;0.96. Those two rows are the paper's headline.</p>
+        <p><strong>Saliency against IG is not a disagreement at all</strong> &mdash; both are gradient methods, and on the GNN and PFN they sit inside the band. Occlusion clears it against either. The split is gradient versus perturbation, not method by method.</p>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <figure>
+      <img src="{{FIG:fig2a_floor_and_ceiling}}" alt="Explainer floor and retraining ceiling for each model and explainer.">
+      <figcaption>
+        <div class="figlabel">Figure 2a &middot; floor and ceiling</div>
+        <p>The floor is what one explainer does when only its own random seed changes; the ceiling is what happens when the model is retrained. The floor sits at or near 1 everywhere, so <strong>retraining moves an explanation far more than an explainer's own sampling does</strong>. Vertical bars mark explainers that are exactly deterministic and have no floor to measure.</p>
+      </figcaption>
+    </figure>
+    <div class="note">
+      <div class="eyebrow">Read with care</div>
+      <p>The EFN rows sit on a 3-feature axis, above the dashed line. With three items a Kendall tau can only take the values &plusmn;1 and &plusmn;1/3, so an EFN ceiling of exactly 1.000 means five seeds happened to agree on one ordering of three things &mdash; not that the explanation is stable. Those rows are a resolution limit, not a finding, and the figure separates them so they cannot be read against the 16-feature rows.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="prose">
+      <h2>The models underneath</h2>
+      <p>None of the above means anything if the taggers themselves were not trained properly, and getting that right took three rounds of correction.</p>
+    </div>
+    <figure>
+      <img src="{{FIG:fig1a_accuracy}}" alt="Test accuracy for each model, one marker per seed.">
+      <figcaption>
+        <div class="figlabel">Figure 1a &middot; performance, one marker per seed</div>
+        <p>All five models on one shared split at 150k training jets, so a GNN number and a BDT number sit on the same axis. The vertical spread within each model is the retraining variation that the ceiling above is built from.</p>
+      </figcaption>
+    </figure>
+    <figure>
+      <img src="{{FIG:fig1c_accuracy_vs_size}}" alt="Accuracy against training set size with the seed range as the error bar.">
+      <figcaption>
+        <div class="figlabel">Figure 1c &middot; seed spread against training size</div>
+        <p>The error bar, not the mean, is the point. Retraining variation grows as the training set shrinks, which is why <strong>a noise floor quoted without its training size cannot be interpreted</strong>.</p>
+      </figcaption>
+    </figure>
+    <figure>
+      <img src="{{FIG:fig1b_per_class_auc}}" alt="Per-class AUC for each model, averaged over seeds.">
+      <figcaption>
+        <div class="figlabel">Figure 1b &middot; per-class AUC</div>
+        <p>Held-out test AUC per jet class, averaged over the five seeds. The EFN trails the others because its inner network sees only the angular columns plus an energy weight, by construction.</p>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <div class="prose">
+      <h2>What the training rounds cost</h2>
+      <p>Three separate times, a spread that looked like seed-to-seed variation turned out to be where training stopped. This is a methodological result in its own right: <strong>a floor measured with sloppy stopping criteria is wrong in an unpredictable direction.</strong></p>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Model</th><th>Problem</th><th>Spread before</th><th>Spread after</th><th>Direction</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PFN</td><td>patience 5 truncated it</td><td class="num">1.4 pts</td><td class="num">0.04 pts</td><td class="flat">shrank 35&times;</td></tr>
+          <tr><td>EFN</td><td>patience 5 truncated it</td><td class="num">3.4 pts</td><td class="num">2.9 pts</td><td class="flat">shrank, rest is real</td></tr>
+          <tr><td>GNN</td><td>patience 5, at 200k jets</td><td class="num">0.5 pts</td><td class="num">0.7 pts</td><td class="pass">grew &mdash; prediction was wrong</td></tr>
+          <tr><td>DNN</td><td>hit a 500-epoch cap</td><td class="num">0.15 pts</td><td class="num">0.18 pts</td><td class="flat">barely moved</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="prose">
+      <p>The GNN row is the interesting one. The prediction, written down in advance, was that removing truncation would <em>shrink</em> its spread. It grew instead, because one seed in five converges legitimately into a worse optimum. The EFN does the same thing at the same training size.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="prose">
+      <h2>Limits to state, not hide</h2>
+      <ul>
+        <li><strong>Five seeds estimates a two-mode distribution badly.</strong> Two of the five models have one seed landing low and four clustered tightly, so the spread is set by a single run. More seeds would be needed to say how often that happens.</li>
+        <li><strong>The floor is measured on the aggregate over 500 test jets.</strong> Per-row explainer noise is averaged away before the correlation is taken, so this is a floor on the dataset-level ranking, not on any single jet's explanation. A per-jet floor would be larger.</li>
+        <li><strong>Row choice is its own variance level.</strong> Resampling which 500 jets get explained moves the ranking less than retraining for nine of ten pairs &mdash; but for BDT SHAP the two effects are the same size. Going to 1000 rows changes almost nothing.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    Figures regenerated from artifacts alone with <code>pixi run figures</code> &mdash; no GPU, no checkpoints, no retraining. Still to come: the interaction, null, mechanism and concentration panels, and the analysis notebook.
+  </footer>
+</div>

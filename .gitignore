@@ -1,0 +1,20 @@
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# pixi environment
+.pixi/
+
+# run outputs, rebuilt by scripts/
+artifacts/
+checkpoints/
+logs/
+figures/
+scratch/figures_page.html
+
+# reference material and paper drafts, not published
+*.md
+!README.md
+references/
+archive_5seed/
